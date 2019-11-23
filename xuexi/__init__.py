@@ -150,6 +150,12 @@ class App(Automation):
         counts = sorted(counts, key=lambda x:x[0], reverse=True)
         counts = [x for x in counts if x[1] not in exclude]
         c, i = counts[0]
+        # 降序排列第一个为计数最大值
+        if 0 == c:
+            randchoiceint = random.randint(1, len(options)) # 0-index + 1
+            randchoicechar = chr(randchoiceint+64)
+            logger.info(f'搜索结果count全0，随机一个 {randchoicechar}')
+            return randchoiceint-1
         logger.info(f'根据搜索结果: {i} 很可能是正确答案')
         return ord(i)-65
 
