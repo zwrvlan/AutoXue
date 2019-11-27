@@ -20,7 +20,6 @@ AutoXue之前的发展偏离了学习`python`的初衷，所以忍痛删除了�
 > 使用方法没啥变化
 
 0. 安装python模块`pip install -r requirements.txt`
-1. 打开夜神模拟器，在cmd中输入`adb connect 127.0.0.1:62001`
-2. 运行脚本`python -m xuexi`
+1. 运行脚本`python -m xuexi`
 
-已将题库查询接口剥离，但是目前没办法提供api接口。一方面本人没有服务器，另一方面部署flask实在没搞懂，所以请在本地起题库接口服务（否则仅依赖百度搜索引擎将影响正确率），移步[flaskr](https://github.com/kessil/flaskr)
+已将题库查询接口剥离，[查看所有题库](http://49.235.90.76/)
