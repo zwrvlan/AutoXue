@@ -9,7 +9,6 @@
 @Copyright © 2019. All rights reserved.
 '''
 import re
-import random
 import time
 import requests
 import string
@@ -22,6 +21,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from .unit import Timer, logger, caps, rules, cfg
 from .model import BankQuery
+from xuexi import SecureRandom
 
 class Automation():
     # 初始化 Appium 基本参数
@@ -62,33 +62,33 @@ class Automation():
     # 屏幕方法
     def swipe_up(self):
         # 向上滑动屏幕
-        self.driver.swipe(self.size['width'] * random.uniform(0.55, 0.65),
-                          self.size['height'] * random.uniform(0.65, 0.75),
-                          self.size['width'] * random.uniform(0.55, 0.65),
-                          self.size['height'] * random.uniform(0.25, 0.35), random.uniform(800, 1200))
+        self.driver.swipe(self.size['width'] * SecureRandom.uniform(0.55, 0.65),
+                          self.size['height'] * SecureRandom.uniform(0.65, 0.75),
+                          self.size['width'] * SecureRandom.uniform(0.55, 0.65),
+                          self.size['height'] * SecureRandom.uniform(0.25, 0.35), SecureRandom.uniform(800, 1200))
         logger.debug('向上滑动屏幕')
 
     def swipe_down(self):
         # 向下滑动屏幕
-        self.driver.swipe(self.size['width'] * random.uniform(0.55, 0.65),
-                          self.size['height'] * random.uniform(0.25, 0.35),
-                          self.size['width'] * random.uniform(0.55, 0.65),
-                          self.size['height'] * random.uniform(0.65, 0.75), random.uniform(800, 1200))
+        self.driver.swipe(self.size['width'] * SecureRandom.uniform(0.55, 0.65),
+                          self.size['height'] * SecureRandom.uniform(0.25, 0.35),
+                          self.size['width'] * SecureRandom.uniform(0.55, 0.65),
+                          self.size['height'] * SecureRandom.uniform(0.65, 0.75), SecureRandom.uniform(800, 1200))
         logger.debug('向下滑动屏幕')
 
     def swipe_right(self):
         # 向右滑动屏幕
-        self.driver.swipe(self.size['width'] * random.uniform(0.01, 0.11),
-                          self.size['height'] * random.uniform(0.75, 0.89),
-                          self.size['width'] * random.uniform(0.89, 0.98),
-                          self.size['height'] * random.uniform(0.75, 0.89), random.uniform(800, 1200))
+        self.driver.swipe(self.size['width'] * SecureRandom.uniform(0.01, 0.11),
+                          self.size['height'] * SecureRandom.uniform(0.75, 0.89),
+                          self.size['width'] * SecureRandom.uniform(0.89, 0.98),
+                          self.size['height'] * SecureRandom.uniform(0.75, 0.89), SecureRandom.uniform(800, 1200))
         logger.debug('向右滑动屏幕')
     def swipe_left(self):
         # 向右滑动屏幕
-        self.driver.swipe(self.size['width'] * random.uniform(0.89, 0.98),
-                          self.size['height'] * random.uniform(0.75, 0.89),
-                          self.size['width'] * random.uniform(0.01, 0.11),
-                          self.size['height'] * random.uniform(0.75, 0.89), random.uniform(800, 1200))
+        self.driver.swipe(self.size['width'] * SecureRandom.uniform(0.89, 0.98),
+                          self.size['height'] * SecureRandom.uniform(0.75, 0.89),
+                          self.size['width'] * SecureRandom.uniform(0.01, 0.11),
+                          self.size['height'] * SecureRandom.uniform(0.75, 0.89), SecureRandom.uniform(800, 1200))
         logger.debug('向左滑动屏幕')
 
     # 返回事件
@@ -165,7 +165,7 @@ class App(Automation):
         # 降序排列第一个为计数最大值
         if 0 == c:     
             # 替换了百度引擎为搜狗引擎，结果全为零的机会应该会大幅降低       
-            _, i = random.choice(counts)
+            _, i = SecureRandom.choice(counts)
             logger.info(f'搜索结果全0，随机一个 {i}')
 
         logger.info(f'根据搜索结果: {i} 很可能是正确答案')
@@ -207,7 +207,7 @@ class App(Automation):
             if t == g:
                 self.challenge_count = 0
             else:
-                self.challenge_count = random.randint(
+                self.challenge_count = SecureRandom.randint(
                         cfg.getint('prefers', 'challenge_count_min'), 
                         cfg.getint('prefers', 'challenge_count_max'))
 
@@ -225,7 +225,7 @@ class App(Automation):
             length_of_options = len(options)
             logger.info(f'<{num}> {content}')
             answer = self._verify(category='单选题', content=content, options=options)
-            delay_time = random.randint(self.delay_bot, self.delay_top)
+            delay_time = SecureRandom.randint(self.delay_bot, self.delay_top)
             logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
             time.sleep(delay_time)
             option_elements[ord(answer)-65].click()
@@ -263,8 +263,8 @@ class App(Automation):
             length_of_options = len(options)
             logger.info(f'<{num}> {content}')
             answer = self._verify(category='单选题', content=content, options=options)
-            final_choose = ((ord(answer)-65)+random.randint(1,length_of_options))%length_of_options
-            delay_time = random.randint(self.delay_bot, self.delay_top)
+            final_choose = ((ord(answer)-65)+SecureRandom.randint(1,length_of_options))%length_of_options
+            delay_time = SecureRandom.randint(self.delay_bot, self.delay_top)
             logger.info(f'随机延时 {delay_time} 秒提交答案: {chr(final_choose+65)}')
             time.sleep(delay_time)
             option_elements[final_choose].click()
@@ -287,7 +287,7 @@ class App(Automation):
                 logger.info(f'已成功挑战 {self.challenge_count} 题，正在返回')
                 break
             else:
-                delay_time = random.randint(5,10)
+                delay_time = SecureRandom.randint(5,10)
                 logger.info(f'本次挑战 {self.challenge_count - result} 题，{delay_time} 秒后再来一组')
                 time.sleep(delay_time)
                 continue
