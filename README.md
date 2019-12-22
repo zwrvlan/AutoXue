@@ -22,4 +22,4 @@ AutoXue之前的发展偏离了学习`python`的初衷，所以忍痛删除了�
 0. 安装python模块`pip install -r requirements.txt`
 1. 运行脚本`python -m xuexi`
 
-已将题库查询接口剥离，[查看所有题库](http://49.235.90.76/)
+已将题库查询接口剥离，[查看所有题库](http://49.235.90.76:5000/)
