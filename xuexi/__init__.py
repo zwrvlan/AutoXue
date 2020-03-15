@@ -275,7 +275,9 @@ class App(Automation):
             except:
                 logger.debug('抱歉回答正确')
                 time.sleep(30)
-        self.safe_back('challenge -> quiz')
+        self.safe_back('challenge -> share_page')
+        # 更新后挑战答题需要增加一次返回
+        self.safe_back('share_page -> quiz')
         return num
 
 

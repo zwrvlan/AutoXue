@@ -105,7 +105,7 @@ venv.bak/
 项目依赖/
 *.log
 *.xml
-*.png
+# *.png
 xuexi/custom.ini
 start_*.cmd
 *.html
