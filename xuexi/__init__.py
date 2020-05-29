@@ -363,8 +363,8 @@ class App(Automation):
             # 利用python切片的特性，即使索引值为-offset，可以正确取值
             option_elements[ord(answer)-65 - offset].click()
             try:
-                time.sleep(2)
-                wrong = self.driver.find_element_by_xpath(rules['challenge_revival'])
+                time.sleep(5)
+                wrong = self.driver.find_element_by_xpath(rules["challenge_revival"])
                 logger.debug(f'很遗憾本题回答错误')
                 self._update_bank({
                         "category": "单选题",
@@ -520,10 +520,10 @@ class App(Automation):
                     content += content_text
                 else:
                     length_of_spaces = len(item.find_elements(By.CLASS_NAME, "android.view.View"))-1
-                    print(f'空格数 {length_of_spaces}')
+                    
                     spaces.append(length_of_spaces)
                     content += " " * (length_of_spaces)
-
+                
         
         else:
             # 针对作妖的UI布局某一版
@@ -544,7 +544,7 @@ class App(Automation):
                 if _spaces:
                     spaces.append(_spaces)
                 logger.debug(f'[填空题] {content} [{" ".join([str(x) for  x in spaces])}]')
-        
+            logger.debug(f'空格数 {spaces}')
         blank_edits = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules["daily_blank_edits"])))
         # blank_edits = self.find_elements(rules["daily_blank_edits"])
         length_of_edits = len(blank_edits)
@@ -678,7 +678,7 @@ class App(Automation):
 
     def _dispatch(self, count_of_each_group):
         for i in range(count_of_each_group):
-            logger.debug(f'每日答题 第 {count_of_each_group-1-i} 题')
+            logger.debug(f'正在答题 第 {i+1} / {count_of_each_group} 题')
             try:
                 category = self.driver.find_element_by_xpath(rules["daily_category"]).get_attribute("name")
             except NoSuchElementException as e:
