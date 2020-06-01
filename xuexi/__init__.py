@@ -116,14 +116,14 @@ class Automation():
     def safe_back(self, msg='default msg'):
         logger.debug(msg)
         self.driver.keyevent(4)
-        time.sleep(1)
+        time.sleep(1) # 返回后延时1秒，如果模拟器渲染较慢，可以适当增大这个延时
 
     def safe_click(self, ele:str):
         logger.debug(f'safe click {ele}')
         button = self.wait.until(EC.presence_of_element_located((By.XPATH, ele)))
         # button = self.find_element(ele)
         button.click()
-        time.sleep(1)
+        time.sleep(1) # 点击后延时1秒，如果模拟器渲染较慢，可以适当增大这个延时
 
     def __del__(self):
         self.driver.close_app()
@@ -337,6 +337,7 @@ class App(Automation):
 
         self.challenge_delay_bot = cfg.getint('prefers', 'challenge_delay_min')
         self.challenge_delay_top = cfg.getint('prefers', 'challenge_delay_max')
+        logger.debug(f'挑战答题: {self.challenge_count}')
 
     def _challenge_cycle(self, num):
         self.safe_click(rules['challenge_entry'])
@@ -354,7 +355,7 @@ class App(Automation):
             answer = self._verify(category='单选题', content=content, options=options)
             delay_time = random.randint(self.challenge_delay_bot, self.challenge_delay_top)            
             if 0 == num:
-                offset = random.randint(1, length_of_options)
+                offset = random.randint(1, length_of_options-1) # randint居然包含上限值，坑爹！！！
                 logger.info(f'已完成指定题量，设置提交选项偏移 -{offset}')
                 logger.info(f'随机延时 {delay_time} 秒提交答案: {chr((ord(answer)-65-offset+length_of_options)%length_of_options+65)}')
             else:
@@ -364,7 +365,7 @@ class App(Automation):
             option_elements[ord(answer)-65 - offset].click()
             try:
                 time.sleep(5)
-                wrong = self.driver.find_element_by_xpath(rules["challenge_revival"])
+                wrong = self.driver.find_element_by_xpath(rules["challenge_over"])
                 logger.debug(f'很遗憾本题回答错误')
                 self._update_bank({
                         "category": "单选题",
@@ -373,7 +374,10 @@ class App(Automation):
                         "answer": "",
                         "excludes": answer,
                         "notes": ""
-                    })
+                    })  
+                logger.debug("点击结束本局")              
+                wrong.click() # 直接结束本局
+                time.sleep(5)
                 break
             except:
                 logger.debug(f'恭喜本题回答正确')
@@ -386,33 +390,13 @@ class App(Automation):
                     "excludes": "",
                     "notes": ""
                 })
-        # else:
-        #     logger.info(f'已完成指定题量, 本题故意答错后自动退出，否则延时30秒等待死亡')
-        #     content = self.wait.until(EC.presence_of_element_located(
-        #         (By.XPATH, rules['challenge_content']))).get_attribute("name")
-        #     # content = self.find_elements(rules['challenge_content']).get_attribute("name")
-        #     option_elements = self.wait.until(EC.presence_of_all_elements_located(
-        #         (By.XPATH, rules['challenge_options'])))
-        #     # option_elements = self.find_elements(rules['challenge_options'])
-        #     options = [x.get_attribute("name") for x in option_elements]
-        #     length_of_options = len(options)
-        #     logger.info(f'<{num}> {content}')
-        #     answer = self._verify(category='单选题', content=content, options=options)
-        #     final_choose = ((ord(answer)-65)+random.randint(1,length_of_options))%length_of_options
-        #     delay_time = random.randint(self.challenge_delay_bot, self.challenge_delay_top)
-        #     logger.info(f'随机延时 {delay_time} 秒提交答案: {chr(final_choose+65)}')
-        #     time.sleep(delay_time)
-        #     option_elements[final_choose].click()
-        #     time.sleep(2)
-        #     try:
-        #         wrong = self.driver.find_element_by_xpath(rules['challenge_revival'])
-        #         logger.debug(f'恭喜回答错误')
-        #     except:
-        #         logger.debug('抱歉回答正确')
-        #         time.sleep(30)
-        self.safe_back('challenge -> share_page')
+        else:
+            logger.debug("通过选项偏移，应该不会打印这句话，除非碰巧答案有误")
+            logger.debug("那么也好，延时30秒后结束挑战")
+            time.sleep(30)
+            self.safe_back('challenge -> share_page') # 发现部分模拟器返回无效
         # 更新后挑战答题需要增加一次返回
-        self.safe_back('share_page -> quiz')
+        self.safe_back('share_page -> quiz') # 发现部分模拟器返回无效
         return num
 
 
@@ -461,6 +445,7 @@ class App(Automation):
 
         self.delay_group_bot = cfg.getint('prefers', 'daily_group_delay_min')
         self.delay_group_top = cfg.getint('prefers', 'daily_group_delay_max')
+        logger.debug(f"每日答题: {self.daily_count}")
 
     def _submit(self, delay=None):
         if not delay:
@@ -677,6 +662,7 @@ class App(Automation):
             })
 
     def _dispatch(self, count_of_each_group):
+        time.sleep(3) # 如果模拟器比较流畅，这里的延时可以适当调短
         for i in range(count_of_each_group):
             logger.debug(f'正在答题 第 {i+1} / {count_of_each_group} 题')
             try:
@@ -761,6 +747,7 @@ class App(Automation):
                         cfg.getint('prefers', 'article_count_min'), 
                         cfg.getint('prefers', 'article_count_max'))
                 self.read_delay = self.read_time // self.read_count + 1
+        logger.debug(f'阅读文章: {self.read_count}')
 
     def _star_once(self):
         if self.back_or_not("收藏"):
@@ -934,6 +921,7 @@ class App(Automation):
                         cfg.getint('prefers', 'video_count_min'), 
                         cfg.getint('prefers', 'video_count_max'))
                 self.view_delay = self.view_time // self.video_count + 1
+        logger.debug(f'视听学习: {self.video_count}')
 
     def music(self):
         if "disable" == self.has_bgm:
@@ -984,6 +972,7 @@ class App(Automation):
 # class Weekly(App):
     def _weekly_init(self):
         self.workdays = cfg.get("prefers", "workdays")
+        logger.debug(f"每周答题: {self.workdays}")
 
     def _weekly(self):
         self.safe_click(rules["weekly_entry"])
