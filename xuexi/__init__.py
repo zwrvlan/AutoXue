@@ -154,7 +154,7 @@ class App(Automation):
 
     def login_or_not(self):
         # com.alibaba.android.user.login.SignUpWithPwdActivity
-        time.sleep(10)
+        time.sleep(10) # 首屏等待时间
         try:
             home = self.driver.find_element_by_xpath(rules["home_entry"])
             logger.debug(f'不需要登录')
@@ -253,7 +253,7 @@ class App(Automation):
     def _verify(self, category, content, options):
         # 职责: 检索题库 查看提示
         letters = list("ABCDEFGHIJKLMN")
-        self.bank = self.query.get({
+        self.bank = self.query.post({
             "category": category,
             "content": content,
             "options": options
@@ -317,6 +317,7 @@ class App(Automation):
 
         
     def _update_bank(self, item):
+        return # 关闭更新功能，看到这里的朋友不要乱改哦，因为API已经拒绝了更新请求，改了也没用
         if not self.bank or not self.bank["answer"]:
             self.query.put(item)
 
@@ -352,7 +353,7 @@ class App(Automation):
             options = [x.get_attribute("name") for x in option_elements]
             length_of_options = len(options)
             logger.info(f'<{num}> {content}')
-            answer = self._verify(category='单选题', content=content, options=options)
+            answer = self._verify(category='挑战题', content=content, options=options)
             delay_time = random.randint(self.challenge_delay_bot, self.challenge_delay_top)            
             if 0 == num:
                 offset = random.randint(1, length_of_options-1) # randint居然包含上限值，坑爹！！！
@@ -534,7 +535,7 @@ class App(Automation):
         # blank_edits = self.find_elements(rules["daily_blank_edits"])
         length_of_edits = len(blank_edits)
         logger.info(f'填空题 {content}')
-        answer = self._verify("填空题", content, "") # 
+        answer = self._verify("填空题", content, []) # 
         if not answer:
             words = (''.join(random.sample(string.ascii_letters + string.digits, 8)) for i in range(length_of_edits))
         else:

@@ -58,14 +58,28 @@ class BankQuery:
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return False
-        logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
-        
+        # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+        options = item["options"]
+        options.extend([""]*(6-len(item["options"])))
         try:
-            res = requests.post(url=url, headers=self.headers, json=item)
-            if 201 == res.status_code:
-                return True
+            res = requests.post(url=url, headers=self.headers, json={
+                "category": item["category"],
+                "content": item["content"],
+                "itemA": options[0],
+                "itemB": options[1],
+                "itemC": options[2],
+                "itemD": options[3],
+                "itemE": options[4],
+                "itemF": options[5],
+                "answer": item.get("answer", ""),
+                "excludes": item.get("excludes", ""),
+                "notes": item.get("notes", "")
+            })
+            if 200 == res.status_code:
+                res = json.loads(res.text)
+                return res["data"]
         except:
-            return False
+            return None
 
     def put(self, item, url=None):
         if not url:
