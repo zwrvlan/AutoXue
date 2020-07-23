@@ -59,7 +59,8 @@ class BankQuery:
             logger.debug(f'content is empty')
             return False
         # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
-        options = item["options"]
+        # python 复制列表为不同的引用指向同一个地址，所以这里拓展options影响了函数外的变量，不可取，应采用深拷贝实现
+        options = item["options"][:]
         options.extend([""]*(6-len(item["options"])))
         try:
             res = requests.post(url=url, headers=self.headers, json={
